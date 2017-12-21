@@ -72,7 +72,8 @@ $Splat_Board = @{
 }
 
 $Dashboard = New-UDDashboard @Splat_Board -Content {
-
+    New-UDLayout -Columns 1 -Content {}
+    #region line charts
     # the first row contains the price history charts for BTC, ETH, and LTC, with an image header of each coin's logo
     New-UDLayout -Columns 3 -Content {
         # Bitcoin column
