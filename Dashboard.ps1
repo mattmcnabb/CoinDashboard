@@ -74,15 +74,12 @@ $Splat_Board = @{
 $Dashboard = New-UDDashboard @Splat_Board -Content {
 
     # the first row contains the price history charts for BTC, ETH, and LTC, with an image header of each coin's logo
-    New-UDRow -Columns {
+    New-UDLayout -Columns 3 -Content {
         # Bitcoin column
-        New-UDColumn -Size 4 -Content {
+        New-UDColumn -Content {
+            New-UDRow -Columns {New-UDColumn -Content {$Img_Bitcoin}}
             New-UDRow -Columns {
-                New-UDColumn -Content {$Img_Bitcoin}
-            }
-            
-            New-UDRow -Columns {
-                New-UDColumn -AutoRefresh -RefreshInterval 30 -Content {
+                New-UDColumn -Content {
                     New-UDChart @Splat_LineChart -Endpoint {
                         param ($TimeRange, $ToCurrency)
 
@@ -112,11 +109,8 @@ $Dashboard = New-UDDashboard @Splat_Board -Content {
         }
 
         # Ether column
-        New-UDColumn -Size 4 -Content {
-            New-UDRow -Columns {
-                New-UDColumn -Content {$Img_Ether}
-            }
-            
+        New-UDColumn -Content {
+            New-UDRow -Columns {New-UDColumn -Content {$Img_Ether}}
             New-UDRow -Columns {
                 New-UDColumn -Content {
                     New-UDChart @Splat_LineChart -Endpoint {
@@ -147,11 +141,8 @@ $Dashboard = New-UDDashboard @Splat_Board -Content {
         }
 
         # Litecoin column
-        New-UDColumn -Size 4 -Content {
-            New-UDRow -Columns {
-                New-UDColumn -Content {$Img_Litecoin}
-            }
-            
+        New-UDColumn -Content {
+            New-UDRow -Columns {New-UDColumn -Content {$Img_Litecoin}}
             New-UDRow -Columns {
                 New-UDColumn -Content {
                     New-UDChart @Splat_LineChart -Endpoint {
@@ -181,7 +172,9 @@ $Dashboard = New-UDDashboard @Splat_Board -Content {
             }
         }
     }
+    #endregion line charts
 
+    #region tables
     # let's make a paged grid with all available coins, and a table of the top coins
     New-UDLayout -Columns 2 -Content {
         New-UDTable -Title "Top Coins" -Headers "Rank", "Name", "Price", "Market Cap", "24 hour change" -Endpoint {
@@ -203,7 +196,8 @@ $Dashboard = New-UDDashboard @Splat_Board -Content {
             Get-Coin -All | Sort-Object SortOrder | Out-UDGridData
         }
     }
+    #endregion tables
 }
-#endregion
+#endregion dashboard
 
 Start-UDDashboard -Dashboard $Dashboard -Wait
