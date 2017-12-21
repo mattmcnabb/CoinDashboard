@@ -51,6 +51,16 @@ $Splat_Board = @{
     NavBarLogo                   = $Img_Treasure
     NavBarLinks                  = $Link_CoinHome, $Link_BlogHome
     EndpointInitializationScript = {
+        try
+        {
+            Import-Module -Name Coin -ErrorAction Stop
+            Import-Module -Name "D:/home/site/wwwroot/Coin"
+        }
+        Catch
+        {
+            throw "Could not find Coin module!"
+        }
+}
 }
 
 $Dashboard = New-UDDashboard @Splat_Board -Content {
