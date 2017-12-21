@@ -21,10 +21,9 @@ $Img_Ether = New-UDImage -Path "$PSScriptRoot\images\Ethereum.png" -Height 50 -W
 $Img_Treasure = New-UDImage -Path "$PSScriptRoot\images\treasure.png" -Height 50 -Width 50
 
 # Chart options
-$Splat_LineChart = @{
-    Type = "Line"
-    #AutoRefresh     = $true
-    #RefreshInterval = 300
+$Splat_Refresh = @{
+    AutoRefresh     = $true
+    RefreshInterval = 30
 }
 
 # Header and Footer
@@ -72,16 +71,23 @@ $Splat_Board = @{
 }
 
 $Dashboard = New-UDDashboard @Splat_Board -Content {
+    # a padding row to move the images down
     New-UDLayout -Columns 1 -Content {}
+
     #region line charts
     # the first row contains the price history charts for BTC, ETH, and LTC, with an image header of each coin's logo
     New-UDLayout -Columns 3 -Content {
         # Bitcoin column
-        New-UDColumn -Content {
-            New-UDRow -Columns {New-UDColumn -Content {$Img_Bitcoin}}
+        New-UDColumn  -Content {
+            New-UDRow -Columns {
+                New-UDColumn -size 6 -Content {$Img_Bitcoin}
+                New-UDColumn @Splat_Refresh -size 6 -Content {
+                    New-UDCard -Text "`$$(Get-CoinPrice BTC USD | select -exp Price)" -TextSize Medium -Watermark usd -TextAlignment Center
+                }
+            }
             New-UDRow -Columns {
                 New-UDColumn -Content {
-                    New-UDChart @Splat_LineChart -Endpoint {
+                    New-UDChart -Type Line -Endpoint {
                         param ($TimeRange, $ToCurrency)
 
                         $Date = Get-Date
@@ -111,10 +117,15 @@ $Dashboard = New-UDDashboard @Splat_Board -Content {
 
         # Ether column
         New-UDColumn -Content {
-            New-UDRow -Columns {New-UDColumn -Content {$Img_Ether}}
+            New-UDRow -Columns {
+                New-UDColumn -size 6 -Content {$Img_Ether}
+                New-UDColumn @Splat_Refresh -size 6 -Content {
+                    New-UDCard -Text "`$$(Get-CoinPrice ETH USD | select -exp Price)" -TextSize Medium -Watermark usd -TextAlignment Center
+                }
+            }
             New-UDRow -Columns {
                 New-UDColumn -Content {
-                    New-UDChart @Splat_LineChart -Endpoint {
+                    New-UDChart -Type Line -Endpoint {
                         param ($TimeRange, $ToCurrency)
 
                         $Date = Get-Date
@@ -143,10 +154,15 @@ $Dashboard = New-UDDashboard @Splat_Board -Content {
 
         # Litecoin column
         New-UDColumn -Content {
-            New-UDRow -Columns {New-UDColumn -Content {$Img_Litecoin}}
+            New-UDRow -Columns {
+                New-UDColumn -size 6 -Content {$Img_Litecoin}
+                New-UDColumn @Splat_Refresh -size 6 -Content {
+                    New-UDCard -Text "`$$(Get-CoinPrice LTC USD | select -exp Price)" -TextSize Medium -Watermark usd -TextAlignment Center
+                }
+            }
             New-UDRow -Columns {
                 New-UDColumn -Content {
-                    New-UDChart @Splat_LineChart -Endpoint {
+                    New-UDChart -Type Line -Endpoint {
                         param ($TimeRange, $ToCurrency)
 
                         $Date = Get-Date
