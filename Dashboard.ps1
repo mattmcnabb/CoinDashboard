@@ -33,9 +33,9 @@ $Link_CoinHome = New-UDLink -OpenInNewWindow -Text "Project Home" -Url "https://
 $Link_BlogHome = New-UDLink -OpenInNewWindow -Text "My Blog" -Url "https://mattmcnabb.github.io" -Icon list
 $Splat_Footer = @{
     BackgroundColor = $Color_Theme4
-    FontColor = $Color_Theme1
-    Links = $Link_UDHome
-    Copyright = "$([char]169) 2017 Matt McNabb All rights reserved"
+    FontColor       = $Color_Theme1
+    Links           = $Link_UDHome
+    Copyright       = "$([char]169) 2017 Matt McNabb All rights reserved"
 }
 $Footer = New-UDFooter @Splat_Footer
 
@@ -43,13 +43,13 @@ $Footer = New-UDFooter @Splat_Footer
 
 #region Dashboard
 $Splat_Board = @{
-    Footer = $Footer
-    BackgroundColor = $Color_Theme3
-    NavBarColor = $Color_Theme5
-    NavBarFontColor = $Color_Theme1
-    Title = "Coins"
-    NavBarLogo = $Img_Treasure
-    NavBarLinks = $Link_CoinHome, $Link_BlogHome
+    Footer                       = $Footer
+    BackgroundColor              = $Color_Theme3
+    NavBarColor                  = $Color_Theme5
+    NavBarFontColor              = $Color_Theme1
+    Title                        = "Coins"
+    NavBarLogo                   = $Img_Treasure
+    NavBarLinks                  = $Link_CoinHome, $Link_BlogHome
     EndpointInitializationScript = {
         try
         {
@@ -71,144 +71,139 @@ $Splat_Board = @{
     }
 }
 
-    $Dashboard = New-UDDashboard @Splat_Board -Content {
+$Dashboard = New-UDDashboard @Splat_Board -Content {
 
-        # the first row contains the price history charts for BTC, ETH, and LTC, with an image header of each coin's logo
-        New-UDRow -Columns {
-            # Bitcoin column
-            New-UDColumn -Size 4 -Content {
-                New-UDRow -Columns {
-                    New-UDColumn -Content {$Img_Bitcoin}
-                }
-            
-                New-UDRow -Columns {
-                    New-UDColumn -AutoRefresh -RefreshInterval 30 -Content {
-                        New-UDChart @Splat_LineChart -Endpoint {
-                            param ($TimeRange, $ToCurrency)
-
-                            $Date = Get-Date
-                            switch ($TimeRange)
-                            {
-                                "1H" {$DataInterval = "Minute"; $Since = $Date.AddHours(-1); $Aggregate = 5}
-                                "1D" {$DataInterval = "Hour"; $Since = $Date.AddHours(-24); $Aggregate = 1}
-                                "1W" {$DataInterval = "Hour"; $Since = $Date.AddDays(-7); $Aggregate = 6}
-                                "1M" {$DataInterval = "Day"; $Since = $Date.AddDays(-30); $Aggregate = 1}
-                                "1Y" {$DataInterval = "Day"; $Since = $Date.AddDays(-365); $Aggregate = 15}
-                                "5Y" {$DataInterval = "Day"; $Since = $Date.AddYears(-5); $Aggregate = 30}
-                            }
-                            $Splat = @{DataInterval = $DataInterval; Since = $Since; Aggregate = $Aggregate}
-
-                            $History = Get-CoinPriceHistory -FromSymbol BTC -ToSymbol $ToCurrency @Splat -Until $Date
-                            $History | Select-Object @{N = "Date"; E = {$_.Time.ToShortDateString()}}, @{N = $ToCurrency; E = {$_.high}} |
-                                Out-UDChartData -LabelProperty Date -Dataset @(
-                                New-UDLineChartDataset -DataProperty $ToCurrency -Label $ToCurrency -BorderWidth 1 -LineTension 0 -BackgroundColor $Color_Bitcoin1 -BorderColor $Color_Bitcoin2
-                            )
-                        } -FilterFields {
-                            New-UDInputField -Type select -Name TimeRange -Values @("1H", "1D", "1W", "1M", "1Y", "5Y") -DefaultValue "1D"
-                            New-UDInputField -Type select -Name ToCurrency -Values @("USD", "ETH", "LTC") -DefaultValue "USD"
-                        }
-                    }
-                }
+    # the first row contains the price history charts for BTC, ETH, and LTC, with an image header of each coin's logo
+    New-UDRow -Columns {
+        # Bitcoin column
+        New-UDColumn -Size 4 -Content {
+            New-UDRow -Columns {
+                New-UDColumn -Content {$Img_Bitcoin}
             }
-
-            # Ether column
-            New-UDColumn -Size 4 -Content {
-                New-UDRow -Columns {
-                    New-UDColumn -Content {$Img_Ether}
-                }
             
-                New-UDRow -Columns {
-                    New-UDColumn -Content {
-                        New-UDChart @Splat_LineChart -Endpoint {
-                            param ($TimeRange, $ToCurrency)
+            New-UDRow -Columns {
+                New-UDColumn -AutoRefresh -RefreshInterval 30 -Content {
+                    New-UDChart @Splat_LineChart -Endpoint {
+                        param ($TimeRange, $ToCurrency)
 
-                            $Date = Get-Date
-                            switch ($TimeRange)
-                            {
-                                "1H" {$DataInterval = "Minute"; $Since = $Date.AddHours(-1); $Aggregate = 5}
-                                "1D" {$DataInterval = "Hour"; $Since = $Date.AddHours(-24); $Aggregate = 1}
-                                "1W" {$DataInterval = "Hour"; $Since = $Date.AddDays(-7); $Aggregate = 6}
-                                "1M" {$DataInterval = "Day"; $Since = $Date.AddDays(-30); $Aggregate = 1}
-                                "1Y" {$DataInterval = "Day"; $Since = $Date.AddDays(-365); $Aggregate = 15}
-                                "5Y" {$DataInterval = "Day"; $Since = $Date.AddYears(-5); $Aggregate = 30}
-                            }
-                            $Splat = @{DataInterval = $DataInterval; Since = $Since; Aggregate = $Aggregate}
-                            $History = Get-CoinPriceHistory -FromSymbol ETH -ToSymbol $ToCurrency @Splat -Until (Get-Date)
-                            $History | Select-Object @{N = "Date"; E = {$_.Time.ToShortDateString()}}, @{N = $ToCurrency; E = {$_.high}} |
-                                Out-UDChartData -LabelProperty Date -Dataset @(
-                                New-UDLineChartDataset -DataProperty $ToCurrency -Label $ToCurrency -BorderWidth 1 -LineTension 0 -BackgroundColor $Color_Ether1 -BorderColor $Color_Ether2
-                            )
-                        } -FilterFields {
-                            New-UDInputField -Type select -Name TimeRange -Values @("1H", "1D", "1W", "1M", "1Y", "5Y") -DefaultValue "1D"
-                            New-UDInputField -Type select -Name ToCurrency -Values @("USD", "BTC", "LTC") -DefaultValue "USD"
+                        $Date = Get-Date
+                        switch ($TimeRange)
+                        {
+                            "1H" {$DataInterval = "Minute"; $Since = $Date.AddHours(-1); $Aggregate = 5}
+                            "1D" {$DataInterval = "Hour"; $Since = $Date.AddHours(-24); $Aggregate = 1}
+                            "1W" {$DataInterval = "Hour"; $Since = $Date.AddDays(-7); $Aggregate = 6}
+                            "1M" {$DataInterval = "Day"; $Since = $Date.AddDays(-30); $Aggregate = 1}
+                            "1Y" {$DataInterval = "Day"; $Since = $Date.AddDays(-365); $Aggregate = 15}
+                            "5Y" {$DataInterval = "Day"; $Since = $Date.AddYears(-5); $Aggregate = 30}
                         }
-                    }
-                }
-            }
+                        $Splat = @{DataInterval = $DataInterval; Since = $Since; Aggregate = $Aggregate}
 
-            # Litecoin column
-            New-UDColumn -Size 4 -Content {
-                New-UDRow -Columns {
-                    New-UDColumn -Content {$Img_Litecoin}
-                }
-            
-                New-UDRow -Columns {
-                    New-UDColumn -Content {
-                        New-UDChart @Splat_LineChart -Endpoint {
-                            param ($TimeRange, $ToCurrency)
-
-                            $Date = Get-Date
-                            switch ($TimeRange)
-                            {
-                                "1H" {$DataInterval = "Minute"; $Since = $Date.AddHours(-1); $Aggregate = 5}
-                                "1D" {$DataInterval = "Hour"; $Since = $Date.AddHours(-24); $Aggregate = 1}
-                                "1W" {$DataInterval = "Hour"; $Since = $Date.AddDays(-7); $Aggregate = 6}
-                                "1M" {$DataInterval = "Day"; $Since = $Date.AddDays(-30); $Aggregate = 1}
-                                "1Y" {$DataInterval = "Day"; $Since = $Date.AddDays(-365); $Aggregate = 15}
-                                "5Y" {$DataInterval = "Day"; $Since = $Date.AddYears(-5); $Aggregate = 30}
-                            }
-                            $Splat = @{DataInterval = $DataInterval; Since = $Since; Aggregate = $Aggregate}
-                            $History = Get-CoinPriceHistory -FromSymbol LTC -ToSymbol $ToCurrency @Splat -Until (Get-Date)
-                            $History | Select-Object @{N = "Date"; E = {$_.Time.ToShortDateString()}}, @{N = $ToCurrency; E = {$_.high}} |
-                                Out-UDChartData -LabelProperty Date -Dataset @(
-                                New-UDLineChartDataset -DataProperty $ToCurrency -Label $ToCurrency -BorderWidth 1 -LineTension 0 -BackgroundColor $Color_Litecoin1 -BorderColor $Color_Litecoin2
-                            )
-                        } -FilterFields {
-                            New-UDInputField -Type select -Name TimeRange -Values @("1H", "1D", "1W", "1M", "1Y", "5Y") -DefaultValue "1D"
-                            New-UDInputField -Type select -Name ToCurrency -Values @("USD", "BTC", "ETH") -DefaultValue "USD"
-                        }
+                        $History = Get-CoinPriceHistory -FromSymbol BTC -ToSymbol $ToCurrency @Splat -Until $Date
+                        $History | Select-Object @{N = "Date"; E = {$_.Time.ToShortDateString()}}, @{N = $ToCurrency; E = {$_.high}} |
+                            Out-UDChartData -LabelProperty Date -Dataset @(
+                            New-UDLineChartDataset -DataProperty $ToCurrency -Label $ToCurrency -BorderWidth 1 -LineTension 0 -BackgroundColor $Color_Bitcoin1 -BorderColor $Color_Bitcoin2
+                        )
+                    } -FilterFields {
+                        New-UDInputField -Type select -Name TimeRange -Values @("1H", "1D", "1W", "1M", "1Y", "5Y") -DefaultValue "1D"
+                        New-UDInputField -Type select -Name ToCurrency -Values @("USD", "ETH", "LTC") -DefaultValue "USD"
                     }
                 }
             }
         }
 
-        # let's make a paged grid with all available coins, and a table of the top coins
-        New-UDRow -Columns {
-            New-UDColumn -Size 6 -Content {
-                New-UDTable -Title "Top Coins" -Headers "Rank", "Name", "Price", "Market Cap", "24 hour change" -Endpoint {
-                    $TopCoins = Get-Coin
-                    $Prices = Get-CoinPrice -FromSymbol $TopCoins.Symbol -ToSymbols USD
-                    $TopCoins | Foreach-Object {
-                        $Price = $Prices | Where-Object FromSymbol -eq $_.Symbol
-                        [PSCustomObject]@{
-                            SortOrder = $_.SortOrder
-                            CoinName = $_.CoinName
-                            Price = $Price.Price
-                            MktCap = $Price.MktCap
-                            ChangePct24Hour = $Price.ChangePct24Hour
-                        }
-                    } | Out-UDTableData -Property "SortOrder", "CoinName", "Price", "MktCap", "ChangePct24Hour"
-                }
+        # Ether column
+        New-UDColumn -Size 4 -Content {
+            New-UDRow -Columns {
+                New-UDColumn -Content {$Img_Ether}
             }
+            
+            New-UDRow -Columns {
+                New-UDColumn -Content {
+                    New-UDChart @Splat_LineChart -Endpoint {
+                        param ($TimeRange, $ToCurrency)
 
-            New-UDColumn -Size 6 -Content {
-                New-UDGrid -Title "All Coins" -Headers "Name", "Symbol", "Total Coin Supply" -Properties "CoinName", "Symbol", "TotalCoinSupply" -Endpoint {
-                    Get-Coin -All | Sort-Object SortOrder | Out-UDGridData
+                        $Date = Get-Date
+                        switch ($TimeRange)
+                        {
+                            "1H" {$DataInterval = "Minute"; $Since = $Date.AddHours(-1); $Aggregate = 5}
+                            "1D" {$DataInterval = "Hour"; $Since = $Date.AddHours(-24); $Aggregate = 1}
+                            "1W" {$DataInterval = "Hour"; $Since = $Date.AddDays(-7); $Aggregate = 6}
+                            "1M" {$DataInterval = "Day"; $Since = $Date.AddDays(-30); $Aggregate = 1}
+                            "1Y" {$DataInterval = "Day"; $Since = $Date.AddDays(-365); $Aggregate = 15}
+                            "5Y" {$DataInterval = "Day"; $Since = $Date.AddYears(-5); $Aggregate = 30}
+                        }
+                        $Splat = @{DataInterval = $DataInterval; Since = $Since; Aggregate = $Aggregate}
+                        $History = Get-CoinPriceHistory -FromSymbol ETH -ToSymbol $ToCurrency @Splat -Until (Get-Date)
+                        $History | Select-Object @{N = "Date"; E = {$_.Time.ToShortDateString()}}, @{N = $ToCurrency; E = {$_.high}} |
+                            Out-UDChartData -LabelProperty Date -Dataset @(
+                            New-UDLineChartDataset -DataProperty $ToCurrency -Label $ToCurrency -BorderWidth 1 -LineTension 0 -BackgroundColor $Color_Ether1 -BorderColor $Color_Ether2
+                        )
+                    } -FilterFields {
+                        New-UDInputField -Type select -Name TimeRange -Values @("1H", "1D", "1W", "1M", "1Y", "5Y") -DefaultValue "1D"
+                        New-UDInputField -Type select -Name ToCurrency -Values @("USD", "BTC", "LTC") -DefaultValue "USD"
+                    }
                 }
             }
         }
-    
+
+        # Litecoin column
+        New-UDColumn -Size 4 -Content {
+            New-UDRow -Columns {
+                New-UDColumn -Content {$Img_Litecoin}
+            }
+            
+            New-UDRow -Columns {
+                New-UDColumn -Content {
+                    New-UDChart @Splat_LineChart -Endpoint {
+                        param ($TimeRange, $ToCurrency)
+
+                        $Date = Get-Date
+                        switch ($TimeRange)
+                        {
+                            "1H" {$DataInterval = "Minute"; $Since = $Date.AddHours(-1); $Aggregate = 5}
+                            "1D" {$DataInterval = "Hour"; $Since = $Date.AddHours(-24); $Aggregate = 1}
+                            "1W" {$DataInterval = "Hour"; $Since = $Date.AddDays(-7); $Aggregate = 6}
+                            "1M" {$DataInterval = "Day"; $Since = $Date.AddDays(-30); $Aggregate = 1}
+                            "1Y" {$DataInterval = "Day"; $Since = $Date.AddDays(-365); $Aggregate = 15}
+                            "5Y" {$DataInterval = "Day"; $Since = $Date.AddYears(-5); $Aggregate = 30}
+                        }
+                        $Splat = @{DataInterval = $DataInterval; Since = $Since; Aggregate = $Aggregate}
+                        $History = Get-CoinPriceHistory -FromSymbol LTC -ToSymbol $ToCurrency @Splat -Until (Get-Date)
+                        $History | Select-Object @{N = "Date"; E = {$_.Time.ToShortDateString()}}, @{N = $ToCurrency; E = {$_.high}} |
+                            Out-UDChartData -LabelProperty Date -Dataset @(
+                            New-UDLineChartDataset -DataProperty $ToCurrency -Label $ToCurrency -BorderWidth 1 -LineTension 0 -BackgroundColor $Color_Litecoin1 -BorderColor $Color_Litecoin2
+                        )
+                    } -FilterFields {
+                        New-UDInputField -Type select -Name TimeRange -Values @("1H", "1D", "1W", "1M", "1Y", "5Y") -DefaultValue "1D"
+                        New-UDInputField -Type select -Name ToCurrency -Values @("USD", "BTC", "ETH") -DefaultValue "USD"
+                    }
+                }
+            }
+        }
     }
-    #endregion
 
-    Start-UDDashboard -Dashboard $Dashboard -Wait
+    # let's make a paged grid with all available coins, and a table of the top coins
+    New-UDLayout -Columns 2 -Content {
+        New-UDTable -Title "Top Coins" -Headers "Rank", "Name", "Price", "Market Cap", "24 hour change" -Endpoint {
+            $TopCoins = Get-Coin
+            $Prices = Get-CoinPrice -FromSymbol $TopCoins.Symbol -ToSymbols USD
+            $TopCoins | Foreach-Object {
+                $Price = $Prices | Where-Object FromSymbol -eq $_.Symbol
+                [PSCustomObject]@{
+                    SortOrder       = $_.SortOrder
+                    CoinName        = $_.CoinName
+                    Price           = $Price.Price
+                    MktCap          = $Price.MktCap
+                    ChangePct24Hour = $Price.ChangePct24Hour
+                }
+            } | Out-UDTableData -Property "SortOrder", "CoinName", "Price", "MktCap", "ChangePct24Hour"
+        }
+
+        New-UDGrid -Title "All Coins" -Headers "Name", "Symbol", "Total Coin Supply" -Properties "CoinName", "Symbol", "TotalCoinSupply" -Endpoint {
+            Get-Coin -All | Sort-Object SortOrder | Out-UDGridData
+        }
+    }
+}
+#endregion
+
+Start-UDDashboard -Dashboard $Dashboard -Wait
