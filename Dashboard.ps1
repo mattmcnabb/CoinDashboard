@@ -81,7 +81,7 @@ $Dashboard = New-UDDashboard @Splat_Board -Content {
         New-UDColumn  -Content {
             New-UDRow -Columns {
                 New-UDColumn -size 6 -Content {$Img_Bitcoin}
-                New-UDColumn @Splat_Refresh -size 6 -Content {
+                New-UDColumn @Splat_Refresh -size 6 -Endpoint {
                     New-UDCard -Text "`$$(Get-CoinPrice BTC USD | select -exp Price)" -TextSize Medium -Watermark usd -TextAlignment Center
                 }
             }
@@ -119,7 +119,7 @@ $Dashboard = New-UDDashboard @Splat_Board -Content {
         New-UDColumn -Content {
             New-UDRow -Columns {
                 New-UDColumn -size 6 -Content {$Img_Ether}
-                New-UDColumn @Splat_Refresh -size 6 -Content {
+                New-UDColumn @Splat_Refresh -size 6 -Endpoint {
                     New-UDCard -Text "`$$(Get-CoinPrice ETH USD | select -exp Price)" -TextSize Medium -Watermark usd -TextAlignment Center
                 }
             }
@@ -156,7 +156,7 @@ $Dashboard = New-UDDashboard @Splat_Board -Content {
         New-UDColumn -Content {
             New-UDRow -Columns {
                 New-UDColumn -size 6 -Content {$Img_Litecoin}
-                New-UDColumn @Splat_Refresh -size 6 -Content {
+                New-UDColumn @Splat_Refresh -size 6 -Endpoint {
                     New-UDCard -Text "`$$(Get-CoinPrice LTC USD | select -exp Price)" -TextSize Medium -Watermark usd -TextAlignment Center
                 }
             }
