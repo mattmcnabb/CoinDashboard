@@ -28,13 +28,13 @@ $Splat_LineChart = @{
 }
 
 # Header and Footer
-$Link_UDHome = New-UDLink -Text "Powered by Universal Dashboard" -Url "https://www.poshud.com" -OpenInNewWindow
-$Link_CoinHome = New-UDLink -OpenInNewWindow -Text "Project Home" -Url "https://github.com/mattmcnabb/coindashboard"
-$Link_BlogHome = New-UDLink -OpenInNewWindow -Text "My Blog" -Url "https://mattmcnabb.github.io"
+$Link_UDHome = New-UDLink -Text "Powered by Universal Dashboard" -Url "https://www.poshud.com" -OpenInNewWindow -icon bar_chart_o
+$Link_CoinHome = New-UDLink -OpenInNewWindow -Text "Project Home" -Url "https://github.com/mattmcnabb/coindashboard" -Icon github
+$Link_BlogHome = New-UDLink -OpenInNewWindow -Text "My Blog" -Url "https://mattmcnabb.github.io" -Icon list
 $Splat_Footer = @{
     BackgroundColor = $Color_Theme4
     FontColor       = $Color_Theme1
-    Links           = $Link_UDHome, $Link_CoinHome, $Link_BlogHome
+    Links           = $Link_UDHome
     Copyright       = "$([char]169) 2017 Matt McNabb All rights reserved"
 }
 $Footer = New-UDFooter @Splat_Footer
@@ -49,7 +49,8 @@ $Splat_Board = @{
     NavBarFontColor              = $Color_Theme1
     Title                        = "Coins"
     NavBarLogo                   = $Img_Treasure
-    EndpointInitializationScript = {Import-Module "D:\home\site\wwwroot\Coin"}
+    NavBarLinks                  = $Link_CoinHome, $Link_BlogHome
+    EndpointInitializationScript = {
 }
 
 $Dashboard = New-UDDashboard @Splat_Board -Content {
