@@ -1,10 +1,6 @@
 $Config = Import-PowerShellDataFile -Path (Join-Path $PSScriptRoot "Config.ps1")
 . (Join-Path $PSScriptRoot "Init.ps1")
 
-$SB_Endpoint = {
-    Import-Module "D:/home/site/wwwroot/Coin"
-}
-
 function New-Title
 {
     param

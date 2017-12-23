@@ -33,5 +33,5 @@ $Splat_Board = @{
     NavBarColor                  = $Config.ThemeColors.Background
     Title                        = ""
     NavBarLinks                  = $Link_CoinHome, $Link_BlogHome
-    EndpointInitializationScript = $SB_Endpoint
+    EndpointInitializationScript = {Import-Module "D:/home/site/wwwroot/Coin"}
 }

@@ -42,4 +42,4 @@ $Board = New-UDDashboard @Splat_Board -Content {
     }
 }
 
-Start-UDDashboard -Dashboard $Board
+Start-UDDashboard -Dashboard $Board -Wait
